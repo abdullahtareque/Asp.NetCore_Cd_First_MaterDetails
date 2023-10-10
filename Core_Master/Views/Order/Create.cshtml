@@ -1,0 +1,155 @@
+﻿
+@model OrderVM
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Order Master</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" id="myForm" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="OrderMaster.OrderNote" class="control-label"></label>
+                <input asp-for="OrderMaster.OrderNote" class="form-control" />
+                <span asp-validation-for="OrderMaster.OrderNote" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OrderMaster.OrderDate" class="control-label"></label>
+                <input asp-for="OrderMaster.OrderDate" type="date" class="form-control" />
+                <span asp-validation-for="OrderMaster.OrderDate" class="text-danger"></span>
+            </div>
+
+           <div class="form-group" style="width: 150px; height: 40px;">
+                <label asp-for="OrderMaster.Terms" class="control-label"></label>
+                <input asp-for="OrderMaster.Terms" type="checkbox" style="transform: scale(2); margin:5px; class="col-sm-2" />
+                <span asp-validation-for="OrderMaster.Terms" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="imagefile" class="control-label"></label>
+                <input asp-for="imagefile" type="file" class="form-control" onchange="document.getElementById('imagePreview').src= window.URL.createObjectURL(this.files[0])"/>
+                 <span asp-validation-for="imagefile" class="text-danger"></span>
+                <img id="imagePreview" src="~/images/noimage.jpg" alt="Image Preview" class="rounded-circle" width="125" height="125" />
+            </div>
+
+
+            <h4>Order Details</h4>
+
+            <table class="table" id="myTable">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.OrderMaster.OrderDetails.Count; i++)
+                    {
+                            <tr>
+                                <td>
+                                @Html.DropDownListFor(model => model.OrderMaster.OrderDetails[i].ProductId, (SelectList)ViewBag.ProductList, "Select a product", new { @class = "form-control" })
+                                <span asp-validation-for="OrderMaster.OrderDetails[i].ProductId" class="text-danger"></span>
+                            </td>
+                                <td>
+                                <input asp-for="OrderMaster.OrderDetails[i].Quantity" class="form-control" />
+                                <span asp-validation-for="OrderMaster.OrderDetails[i].Quantity" class="text-danger"></span>
+                                </td>
+                                <td>
+                                <input asp-for="OrderMaster.OrderDetails[i].Price" class="form-control" />
+                                <span asp-validation-for="OrderMaster.OrderDetails[i].Price" class="text-danger"></span>
+                                </td>
+                                <td>
+                                @if (i > 0)
+                                {
+                                    <button type="button" class="btn btn-danger" onclick="RemoveItem(this)">Remove</button>
+                                }
+                                </td>
+                                
+                            </tr>
+                    }
+                </tbody>
+            </table>
+
+            <input type="hidden" id="hdnLastIndex" value="@(Model.OrderMaster.OrderDetails.Count - 1)" />
+
+            <div class="form-group">
+                <button type="button" class="btn btn-primary" onclick="AddItem()">Add Detail</button>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+        <script>
+            function AddItem() {
+                var table = document.getElementById('myTable');
+                var lastRowIndex = parseInt(document.getElementById('hdnLastIndex').value);
+                var nextRowIndex = lastRowIndex + 1;
+
+                var newRow = table.insertRow();
+                    newRow.innerHTML = @await Html.PartialAsync("_partial");
+
+                document.getElementById('hdnLastIndex').value = nextRowIndex;
+            }
+
+            function RemoveItem(button) {
+                var row = button.closest('tr');
+                row.remove();
+                UpdateRowIndex();
+            }
+
+            function UpdateRowIndex() {
+                var table = document.getElementById('myTable');
+                var rows = table.getElementsByTagName('tr');
+                var lastIndexInput = document.getElementById('hdnLastIndex');
+
+                for (var i = 0; i < rows.length; i++) {
+                    var inputs = rows[i].getElementsByTagName('input');
+                    var selects = rows[i].getElementsByTagName('select');
+
+                    for (var j = 0; j < inputs.length; j++) {
+                        var inputName = inputs[j].name;
+                        inputName = inputName.replace(/\[\d+\]/g, '[' + i + ']');
+                        inputs[j].name = inputName;
+
+                        var span = document.querySelector('span[data-valmsg-for="' + inputName + '"]');
+                        if (span) {
+                            span.setAttribute('data-valmsg-for', inputName);
+                        }
+                    }
+
+                    for (var k = 0; k < selects.length; k++) {
+                        var selectName = selects[k].name;
+                        selectName = selectName.replace(/\[\d+\]/g, '[' + i + ']');
+                        selects[k].name = selectName;
+
+                        var span = document.querySelector('span[data-valmsg-for="' + selectName + '"]');
+                        if (span) {
+                            span.setAttribute('data-valmsg-for', selectName);
+                        }
+                    }
+                }
+
+                lastIndexInput.value = rows.length - 1;
+            }
+
+
+            window.onload = function () {
+                document.getElementById("myForm").reset();
+            };
+        </script>
+}
+
+

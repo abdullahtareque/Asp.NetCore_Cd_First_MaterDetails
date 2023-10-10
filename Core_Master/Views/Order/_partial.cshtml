@@ -1,0 +1,21 @@
+﻿`<td>
+    <select class="form-control" name="OrderMaster.OrderDetails[${nextRowIndex}].ProductId">
+        <option value="">Select a product</option>
+        @foreach (var product in ViewBag.ProductList)
+        {
+            <option value="@product.Value">@product.Text</option>
+        }
+        </select>
+    <span class="text-danger" data-valmsg-for="OrderMaster.OrderDetails[${nextRowIndex}].ProductId"></span>
+    </td>
+    <td>
+    <input type="text" class="form-control" name="OrderMaster.OrderDetails[${nextRowIndex}].Quantity" />
+    <span class="text-danger" data-valmsg-for="OrderMaster.OrderDetails[${nextRowIndex}].Quantity"></span>
+    </td>
+    <td>
+    <input type="text" class="form-control" name="OrderMaster.OrderDetails[${nextRowIndex}].Price" />
+    <span class="text-danger" data-valmsg-for="OrderMaster.OrderDetails[${nextRowIndex}].Price"></span>
+    </td>
+    <td>
+        <button type="button" class="btn btn-danger" onclick="RemoveItem(this)">Remove</button>
+</td>`
